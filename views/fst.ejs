@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script type="text/javascript">window.c = console; c.l= c.log</script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="scripts/fst.js"></script>
+  </head>
+  <body>
+    <div id="fst">
+
+      <div id="header">
+        <a href="/"><button><--back</button></a>
+        <span>FormulaSampleTracker</span>
+
+        <select id="projectList">
+          <option selected>Load Project...</option>
+          <% projects.forEach(function(project){ %>
+            <option class="project<%= project %>"><%= project %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div id="instrumentBox"></div>
+
+      <div id="patternBox"></div>
+
+      <div id="songBox"></div>
+  
+    </div>
+  </body>
+</html>

@@ -1,0 +1,46 @@
+.pull-right { float: right; }
+.pull-left { float: left; }
+body {
+  padding: 0;
+  margin: 0;
+  font: 16px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+div.light {
+  width:0;
+  background: rgba(0,0,0,0);
+}
+.darkness {
+  background: black;
+  z-index: 9999;
+  position: absolute;
+  bottom:0;
+  width: 50%; height: 10%;
+  transition: all 1.3s;
+  &.left { left:50%;}
+  &.right { right:50%; }
+}
+
+div#apps{
+  div {
+    float: left;
+    /* display: inline-block; */
+    width: 96%;
+    border: 4px solid black;
+    text-align: center;
+    padding: 5px;
+    margin: 0.2% 2%;
+    /* word-break: break-word; */
+    box-sizing: border-box;
+    &:hover, &.active {
+      background: lightgrey;
+      color: red;
+    } 
+  }
+}
+
+a {
+  text-decoration: none;
+  color: black;
+  font-size: 16px;
+}

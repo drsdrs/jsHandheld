@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script type="text/javascript">window.c = console; c.l= c.log</script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="scripts/main.js"></script>
+  </head>
+  <body>
+
+    <p><%= title %></p>
+    <div class="left darkness"></div>
+    <div class="right darkness"></div>
+    <div id="apps">
+      <% var back = back|false; if(back){ %>
+        <a href="/"><div><span>go back ...</span></div></a>
+      <% } %>
+      <% apps.forEach(function(app){%>
+        <a href="/<%= app.name%>"><div>
+        <% if(app.img){ %><img class="pull-left" src="images/<%= app.img %>.png"><% } %>
+        <span><%= app.name %></span>
+      </div></a>
+    <% }) %>
+    </div>
+
+
+  </body>
+</html>

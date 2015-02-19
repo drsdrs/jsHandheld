@@ -1,0 +1,4 @@
+#/bin/sh
+killall node nodejs grunt nodemon coffee -s SIGKILL
+grunt &
+nodemon app.coffee -w app.coffee -w routes/* -w server/*

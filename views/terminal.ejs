@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script type="text/javascript">window.c = console; c.l= c.log</script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="scripts/terminal.js"></script>
+  </head>
+  <body>
+
+    <button><a href="/SysTools"><--back</a></button>
+    <p>Welcome to your personal js-TERMINAL</p>
+    <i>type kill to end last process</i>
+    <br/>
+    <i>type clear to clear output log</i>
+    <hr>
+    <input type="text" value="$" id="bash">
+    <hr>
+    <pre id="output"></pre>
+  </body>
+</html>

@@ -1,0 +1,149 @@
+#fst {
+  display: inline-block;
+  width: 100%;
+}
+#fst > div {
+  border: 1px solid black;
+}
+#fst #header {
+  background: #ddf;
+}
+#popup,
+#keyField {
+  position: fixed;
+  display: inline-block;
+  width: 100%;
+  height: 0;
+  bottom: 0;
+  left: 0;
+  background: white;
+  border: 0 dotted #111;
+  box-sizing: border-box;
+  transition: all 0.6s;
+}
+#popup.open,
+#keyField.open {
+  border: 3px dotted #111;
+  transition: all 0.3s;
+}
+#popup.open.h100,
+#keyField.open.h100 {
+  height: 100%;
+}
+#popup.open.h60,
+#keyField.open.h60 {
+  height: 60%;
+}
+#popup .col1,
+#popup .col2 {
+  position: relative;
+  width: 49.5%;
+  height: 99%;
+  background: #111;
+  color: #fff;
+  box-sizing: border-box;
+  margin: 0.25%;
+  text-align: center;
+  overflow: hidden;
+}
+#popup .col1.active,
+#popup .col2.active {
+  background: #000;
+  color: #ff0;
+}
+#popup .col1 span,
+#popup .col2 span {
+  display: block;
+  border-bottom: 1px solid white;
+  padding: 3px;
+  font-weight: lighter;
+}
+#popup .col1 span.active,
+#popup .col2 span.active {
+  background: #444;
+}
+#popup .col1 span.preActive,
+#popup .col2 span.preActive {
+  background: #888;
+}
+#popup .col1 {
+  float: left;
+}
+#popup .col2 {
+  float: right;
+}
+#keyField {
+  text-align: center;
+}
+#keyField div {
+  display: block;
+}
+#keyField div .active {
+  background: #333;
+  color: #aaa;
+}
+#keyField div input {
+  width: 74%;
+}
+#keyField div button {
+  width: 25%;
+  float: right;
+}
+#keyField div span {
+  height: 100%;
+  display: inline-block;
+  border: 2px solid black;
+  box-sizing: border-box;
+}
+
+.pull-right {
+  float: right;
+}
+.pull-left {
+  float: left;
+}
+body {
+  padding: 0;
+  margin: 0;
+  font: 16px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+div.light {
+  width: 0;
+  background: rgba(0, 0, 0, 0);
+}
+.darkness {
+  background: black;
+  z-index: 9999;
+  position: absolute;
+  bottom: 0;
+  width: 50%;
+  height: 10%;
+  transition: all 1.3s;
+}
+.darkness.left {
+  left: 50%;
+}
+.darkness.right {
+  right: 50%;
+}
+div#apps div {
+  float: left;
+  /* display: inline-block; */
+  width: 96%;
+  border: 4px solid black;
+  text-align: center;
+  padding: 5px;
+  margin: 0.2% 2%;
+  /* word-break: break-word; */
+  box-sizing: border-box;
+}
+div#apps div:hover,
+div#apps div.active {
+  background: lightgrey;
+  color: red;
+}
+a {
+  text-decoration: none;
+  color: black;
+  font-size: 16px;
+}
