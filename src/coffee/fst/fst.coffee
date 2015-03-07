@@ -10,36 +10,40 @@ initMainCtrl = ()->
 
 window.onload = ->
   projectList = document.getElementById("projectList")
-  socket = io.connect('http://localhost:3000/formulaSampleTracker')
+  eventIO = io.connect('http://localhost:3000/eventRouter')
   #("/fst")
 
   # EVENTS
   socket.on 'projectLoaded', (project)-> initProject(project)
   projectList.addEventListener "change", (e)->
     saveProject()
-    socket.emit "loadProject", e.target.value
+    loadProject e.target.value
 
   #autosave every nth seconds
-  setInterval (setActiveProjectLs), 30*1000
-  
+  #setInterval (setActiveProjectLs), 30*1000
+
+  #gamepad events
+  eventIO.on "ctrl", (v)-> window.ctrl[v]()
+
+
   initProject = (project) ->
     window.project = project
-    projectList.value = project._id
-    genInstruments()
-    genpatterns()
+    projectList.value = project.id
+    genInstrumentView()
+    genpatternView()
 
-  saveProject = ()-> socket.emit "saveProject", project
+  saveProject = ()->
+    console.log window.project.patterns.intro.steps[0]
+    socket.emit "saveProject", window.project
   loadProject = (projectName)->
-    if projectName? then projectName = projectList[1].value
+    if !projectName? then projectName = projectList[1].value
     socket.emit "loadProject", projectName
 
   #try load previous project from localstorrage
-  project = getActiveProjectLs()
-  if project? then initProject(project)
-  else loadProject()
+  loadProject()
 
 
-  initMainCtrl()
+  #initMainCtrl()
 
   document.addEventListener "keyup", (e)->
     key = e.keyCode
@@ -47,7 +51,6 @@ window.onload = ->
     evt = e ? e:window.event
     if evt.stopPropagation then evt.stopPropagation()
     if evt.cancelBubble!=null then evt.cancelBubble = true
-    c.l key
     action =
       if key==37 then "left"
       else if key==38 then "up"
@@ -59,10 +62,9 @@ window.onload = ->
 
 
 window.onunload = (e)->
-  setActiveProjectLs()
-  socket.emit "saveProject", project
-
-
-window.onbeforeunload = (e)->
-  alert "HELLO"
+  socket.emit "saveProject"
   socket.close()
+  #setActiveProjectLs()
+
+
+#window.onbeforeunload = (e)->

@@ -38,11 +38,16 @@ module.exports = (grunt) ->
           'public/scripts/main.js': 'src/coffee/main.coffee'
           'public/scripts/terminal.js': 'src/coffee/terminal/**/*.coffee'
           'public/scripts/fst.js': 'src/coffee/fst/**/*.coffee'
+          'public/scripts/endymen.js': 'src/coffee/endymen/**/*.coffee'#, 'src/coffee/utils/keyField.coffee'
+          'public/scripts/turnbased.js': 'src/coffee/turnbased/**/*.coffee'#, 'src/coffee/utils/keyField.coffee'
 
     less:
       client:
         files:
-          'public/stylesheets/style.css':'src/less/**/*.*'
+          'public/stylesheets/style.css':'src/less/style.less'
+          'public/stylesheets/fst.css':'src/less/fst.less'
+          'public/stylesheets/endymen.css':'src/less/endymen.less'
+          'public/stylesheets/turnbased.css':'src/less/turnbased.less'
 
   grunt.loadNpmTasks "grunt-contrib-watch"
   grunt.loadNpmTasks "grunt-contrib-less"

@@ -1,9 +1,37 @@
+.active {
+  color: white;
+  background: #111;
+}
+
 #fst {
   display: inline-block;
   width: 100%;
-  &>div { border: 1px solid black; }
+  &>div {
+    //display: inline-block;
+  }
   #header {
     background: #ddf;
+  }
+
+  #patternBox {
+    table {
+        border-bottom: 1px solid black;
+        border-right: 1px solid black;
+        border-spacing: 0px;
+      td {
+        border-radius: 5px;
+        border-top: 1px solid black;
+        border-left: 1px solid black;
+        padding: 4px;
+        &.pos {
+          border-right: 3px solid black;
+          border-left: 3px solid black;
+        }
+        &.oct, &.fx0Val {
+          border-left: 0;
+        }
+      }
+    }
   }
 }
 

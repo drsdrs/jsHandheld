@@ -1,0 +1,99 @@
+#table span {
+  width: 40px;
+  /* padding: 0.5px; */
+  margin: 0;
+  font-size: 26px;
+  height: 40px;
+  display: inline-block;
+  text-align: center;
+  position: relative;
+  line-height: 40px;
+}
+.hidden {
+  display: none;
+}
+.color-happy {
+  background: #eeef13;
+}
+.color-cog {
+  background: #42aa02;
+}
+.color-pacman {
+  background: #2412ee;
+  color: #eeef13;
+}
+.color-skeletor {
+  background: #0a4202;
+}
+.color-fire {
+  background: #ff0022;
+}
+.color-sun-fill {
+  background: #eeaa00;
+}
+.color-bomb {
+  background: #ff5522;
+}
+.color-neutral {
+  background: #888888;
+}
+.color-frustrated {
+  background: #111111;
+  color: #aaaaaa;
+}
+@font-face {
+  font-family: 'icomoon';
+  src: url('fonts/icomoon.eot?ocgm7z');
+  src: url('fonts/icomoon.eot?#iefixocgm7z') format('embedded-opentype'), url('fonts/icomoon.woff?ocgm7z') format('woff'), url('fonts/icomoon.ttf?ocgm7z') format('truetype'), url('fonts/icomoon.svg?ocgm7z#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+[class^="icon-"],
+[class*=" icon-"] {
+  font-family: 'icomoon';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.icon-stop:before {
+  content: "\e600";
+}
+.icon-sun-fill:before {
+  content: "\e601";
+}
+.icon-circle-full:before {
+  content: "\e602";
+}
+.icon-fire:before {
+  content: "\e9a9";
+}
+.icon-happy:before {
+  content: "\e9df";
+}
+.icon-smile:before {
+  content: "\e9e1";
+}
+.icon-neutral:before {
+  content: "\e9f7";
+}
+.icon-frustrated:before {
+  content: "\e9ff";
+}
+.icon-cog:before {
+  content: "\e603";
+}
+.icon-pacman:before {
+  content: "\e604";
+}
+.icon-skeletor:before {
+  content: "\e605";
+}
+.icon-bomb:before {
+  content: "\e606";
+}

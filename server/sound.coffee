@@ -1,8 +1,3 @@
-###*
-# Code adapted from:
-# http://blogs.msdn.com/b/dawate/archive/2009/06/24/intro-to-audio-programming-part-3-synthesizing-simple-wave-audio-using-c.aspx
-###
-
 Readable = require('stream').Readable || require('readable-stream/readable')
 Speaker = require('speaker')
 soundGens = []
@@ -15,8 +10,6 @@ fxs = [
   {f:"t^t>>4*Math.sin(t>>11)", l:40000}
   {f:"((t>>t>>2)&t>>8)*(t>>(255&t>>7))", l:29000}
 ]
-
-
 
 Array::clean = (deleteValue) ->
   i = 0
@@ -49,7 +42,6 @@ fillNextBuffer = (n, g, cb)->
   nextBuffer = buf
   cb?()
 
-
 read = (n) ->
   if n==0&&!n?
     c.l "###->?? n=0 or !n? ---error in read function"
@@ -60,6 +52,7 @@ read = (n) ->
 
 
 class SoundGen
+  id: (~~Math.random()*999999)+"|"+Date.now()
   length: 44100*2
   formula: "(999999999/t)&(t&t<<2)>>8"
   t: 0
@@ -69,12 +62,16 @@ class SoundGen
     @makeSampleFunct()
   makeSampleFunct: ()-> @sampleFunct = new Function("t", "return "+@formula)
   next: ->
-    if @t>@length
-      delete @
-      soundGens.clean @
-      return 128 
-    @t++
-    @sampleFunct(@t)
+    if @t<@length
+      @t++
+      @sampleFunct(@t)
+    else
+      @destroy()
+      return 128
+  destroy: ->
+    delete @
+    soundGens.clean @
+
   get: (k)-> @[k]
   set: (k,v)->
     @[k]=v
@@ -84,17 +81,10 @@ class SoundGen
 addSoundGen = (opts)->
   soundGens.push new SoundGen(opts||null)
 
-
 addFx = (fxnr)->
   fx = fxs[fxnr]||null
   if fx then addSoundGen formula: fx.f, length: fx.l
   else c.l "cant find fx with nr."+fxnr
-  #fillNextBuffer(0,[])
-  readable.samplesGenerated=0
-  #fillNextBuffer nextBuffer.length, soundGens, ->
-  #  fillNextBuffer nextBuffer.length, soundGens
-  #readable.samplesGenerated=0
-  #readable.pipe speaker
 
 
 readableCfg = 
@@ -109,7 +99,7 @@ readable = new Readable
 for k,v of readableCfg then readable[k] = v
 
 speaker = new Speaker
-readable.pipe speaker 
+#readable.pipe speaker 
 
 module.exports =
   addSndGen: addSoundGen

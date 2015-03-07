@@ -1,5 +1,4 @@
-
-genInstruments = ()->
+genInstrumentView = ()->
   instruments = project.instruments||null
   if project.instruments? then instruments = project.instruments
   else console.log "no instrument data"

@@ -4,6 +4,7 @@ categories= {
     {name: "camTimelapsMotion", img: "cam"}
     {name: "formulaSampleTracker", img: "fst"}
     {name: "mameVertical", img: "mame"}
+    {name: "endymen", img: "*"}
     {name: "SysTools", img: "*"}
   ]
   systools: [

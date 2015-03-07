@@ -1,4 +1,4 @@
-var demoArr, genInstruments, genKeyField, genPopup, genWorker, genpatterns, getActiveProjectLs, initMainCtrl, keySets, setActiveProjectLs, worker;
+var activePatternName, demoArr, demoStep, freqTable, fxList, genInstrumentView, genKeyField, genPopup, genWorker, genpatternView, getActiveProjectLs, getFreq, i, initMainCtrl, initTableCtrl, keySets, maxXPos, maxYPos, notation, setActiveProjectLs, socket, tableEl, worker;
 
 initMainCtrl = function() {
   return window.ctrl = {
@@ -24,39 +24,36 @@ initMainCtrl = function() {
 };
 
 window.onload = function() {
-  var initProject, loadProject, project, projectList, saveProject, socket;
+  var eventIO, initProject, loadProject, projectList, saveProject;
   projectList = document.getElementById("projectList");
-  socket = io.connect('http://localhost:3000/formulaSampleTracker');
+  eventIO = io.connect('http://localhost:3000/eventRouter');
   socket.on('projectLoaded', function(project) {
     return initProject(project);
   });
   projectList.addEventListener("change", function(e) {
     saveProject();
-    return socket.emit("loadProject", e.target.value);
+    return loadProject(e.target.value);
   });
-  setInterval(setActiveProjectLs, 30 * 1000);
+  eventIO.on("ctrl", function(v) {
+    return window.ctrl[v]();
+  });
   initProject = function(project) {
     window.project = project;
-    projectList.value = project._id;
-    genInstruments();
-    return genpatterns();
+    projectList.value = project.id;
+    genInstrumentView();
+    return genpatternView();
   };
   saveProject = function() {
-    return socket.emit("saveProject", project);
+    console.log(window.project.patterns.intro.steps[0]);
+    return socket.emit("saveProject", window.project);
   };
   loadProject = function(projectName) {
-    if (projectName != null) {
+    if (projectName == null) {
       projectName = projectList[1].value;
     }
     return socket.emit("loadProject", projectName);
   };
-  project = getActiveProjectLs();
-  if (project != null) {
-    initProject(project);
-  } else {
-    loadProject();
-  }
-  initMainCtrl();
+  loadProject();
   return document.addEventListener("keyup", function(e) {
     var action, evt, key, _base;
     key = e.keyCode;
@@ -69,23 +66,17 @@ window.onload = function() {
     if (evt.cancelBubble !== null) {
       evt.cancelBubble = true;
     }
-    c.l(key);
     action = key === 37 ? "left" : key === 38 ? "up" : key === 39 ? "right" : key === 40 ? "down" : key === 13 ? "enter" : key === 32 ? "back" : void 0;
     return typeof (_base = window.ctrl)[action] === "function" ? _base[action]() : void 0;
   });
 };
 
 window.onunload = function(e) {
-  setActiveProjectLs();
-  return socket.emit("saveProject", project);
-};
-
-window.onbeforeunload = function(e) {
-  alert("HELLO");
+  socket.emit("saveProject");
   return socket.close();
 };
 
-genInstruments = function() {
+genInstrumentView = function() {
   var changeInstrument, formulaEl, h2El, instrumentBoxEl, instrumentEl, instrumentOptionEl, instrumentSelectEl, instruments, instrumentsEl, key, loadSampleEl, val;
   instruments = project.instruments || null;
   if (project.instruments != null) {
@@ -292,49 +283,361 @@ setActiveProjectLs = function(cb) {
   }
 };
 
-genpatterns = function() {
-  var genCollectionSelect, genPattern, patternBoxEl, patternSelectEl, patterns, tableEl;
-  patterns = project.patterns;
-  patternBoxEl = document.getElementById("patternBox");
-  patternSelectEl = document.createElement("select");
-  tableEl = document.createElement("table");
-  patternBoxEl.innerHTML = "";
-  patternBoxEl.appendChild(patternSelectEl);
-  patternBoxEl.appendChild(tableEl);
-  genPattern = function(patternName) {
-    return tableEl.innerHTML = "";
+socket = io.connect('http://localhost:3000/formulaSampleTracker');
+
+fxList = ["E", "F", "H"];
+
+notation = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+demoStep = {
+  note: "C",
+  oct: "3",
+  vel: "75",
+  fx0: "E",
+  fx0Val: 0x64
+};
+
+getFreq = function(n) {
+  return Math.pow(2, (n - 69) / 12) * 440;
+};
+
+tableEl = null;
+
+maxXPos = Object.keys(demoStep).length;
+
+maxYPos = 0;
+
+activePatternName = null;
+
+freqTable = [];
+
+i = 128;
+
+while (i--) {
+  freqTable[i] = getFreq(i);
+}
+
+initTableCtrl = function() {
+  var activeEl, checkPos, setActive, setValue, tablePos;
+  tablePos = [0, 0];
+  activeEl = null;
+  checkPos = function() {
+    if (tablePos[0] < 1) {
+      tablePos[0] = maxXPos;
+    } else if (tablePos[0] > maxXPos) {
+      tablePos[0] = 1;
+    }
+    if (tablePos[1] < 0) {
+      return tablePos[1] = maxYPos - 1;
+    } else if (tablePos[1] >= maxYPos) {
+      return tablePos[1] = 0;
+    }
   };
-  genCollectionSelect = function(collection) {
-    var appendOption, key, val, _results;
-    appendOption = function(key) {
-      var patternEl, patternOptionEl;
-      patternOptionEl = document.createElement("option");
-      patternEl = document.createElement("div");
-      patternOptionEl.addEventListener("click", function(e) {
-        var sel;
-        sel = e.target.value;
-        if (sel === "new") {
-          genKeyField("letters", function(e) {
-            return appendOption(e);
-          });
-          return patternSelectEl.blur();
-        } else {
-          return genPattern(sel);
+  setActive = function() {
+    var x, y;
+    checkPos();
+    x = tablePos[1];
+    y = tablePos[0];
+    c.l(activeEl);
+    if (activeEl != null) {
+      activeEl.classList.remove("active");
+    }
+    activeEl = tableEl.childNodes[x].childNodes[y];
+    return activeEl.classList.add("active");
+  };
+  window.ctrl = {
+    left: function() {
+      tablePos[0]--;
+      return setActive();
+    },
+    right: function() {
+      tablePos[0]++;
+      return setActive();
+    },
+    up: function() {
+      tablePos[1]--;
+      return setActive();
+    },
+    down: function() {
+      tablePos[1]++;
+      return setActive();
+    },
+    enter: function() {
+      return setValue(+1);
+    },
+    back: function() {
+      return setValue(-1);
+    }
+  };
+  return setValue = function(add) {
+    var len, pos, set, type, val;
+    if (!activeEl) {
+      return c.l("noActive");
+    }
+    val = activeEl.innerHTML;
+    type = activeEl.className.split(" ")[0];
+    set = function() {
+      var row;
+      activeEl.innerHTML = val;
+      row = tablePos[1];
+      project.patterns[activePatternName].steps[row][type] = val;
+      return socket.emit("setPatternValue", {
+        patternName: activePatternName,
+        row: row,
+        type: type,
+        val: val
+      });
+    };
+    if (type.slice(0, 2) === "fx" && type.slice(3, 6) !== "Val") {
+      len = fxList.length;
+      pos = val === "=" ? ~~(len / 2) : 0;
+      fxList.forEach(function(note, i) {
+        if (note === val) {
+          return pos = i;
         }
       });
-      patternEl.classList.add(key, "pattern");
-      patternOptionEl.innerHTML = key;
-      return patternSelectEl.appendChild(patternOptionEl);
+      if (pos == null) {
+        pos = ~~(len / 2);
+      }
+      pos += add;
+      if (pos >= len) {
+        pos = 0;
+      } else if (pos < 0) {
+        pos = len - 1;
+      }
+      val = fxList[pos];
+      set();
+    } else if (type === "note") {
+      len = notation.length;
+      pos = val === "=" ? ~~(len / 2) : 0;
+      notation.forEach(function(note, i) {
+        if (note === val) {
+          return pos = i;
+        }
+      });
+      if (pos == null) {
+        pos = 0;
+      }
+      pos += add;
+      if (pos >= len) {
+        pos = 0;
+      } else if (pos < 0) {
+        pos = len - 1;
+      }
+      val = notation[pos];
+      set();
+    }
+    val = parseInt(activeEl.innerHTML);
+    if (isNaN(val)) {
+      val = 0;
+    } else {
+      val += add;
+    }
+    if (type === "oct") {
+      if (val >= 12) {
+        val = 12;
+      } else if (val <= -12) {
+        val = -12;
+      }
+      return set();
+    } else if (type === "vel") {
+      if (val >= 128) {
+        val = 128;
+      } else if (val <= 0) {
+        val = 0;
+      }
+      return set();
+    } else if (type.slice(3, 6) === "Val") {
+      if (val >= 256) {
+        val = 256;
+      } else if (val <= 0) {
+        val = 0;
+      }
+      return set();
+    }
+  };
+};
+
+genpatternView = function() {
+  var appendOption, genCollectionSelect, genPattern, genPatternModOptions, patternBoxEl, patternSelectEl, patterns, ptnConfigEl;
+  patterns = project.patterns;
+  patternBoxEl = document.getElementById("patternBox");
+  ptnConfigEl = document.createElement("div");
+  patternSelectEl = document.createElement("select");
+  tableEl = document.createElement("table");
+  ptnConfigEl.appendChild(patternSelectEl);
+  patternBoxEl.innerHTML = "";
+  patternBoxEl.appendChild(ptnConfigEl);
+  patternBoxEl.appendChild(tableEl);
+  patternSelectEl.addEventListener("click", function(e) {
+    var sel;
+    sel = e.target.value;
+    if (sel === "new") {
+      genKeyField("letters", function(e) {
+        var k, name, v, _ref;
+        name = e.innerText;
+        _ref = project.patterns;
+        for (k in _ref) {
+          v = _ref[k];
+          if (k === name) {
+            name = e.target.value = name + "Dupl";
+          }
+        }
+        patternSelectEl.value = name;
+        appendOption(e);
+        project.patterns[e] = {
+          steps: [{}, {}, {}, {}, {}, {}, {}, {}]
+        };
+        return socket.emit("updatePattern", {
+          name: e,
+          data: project.patterns[e]
+        });
+      });
+      return patternSelectEl.blur();
+    } else {
+      return genPattern(sel);
+    }
+  });
+  genPattern = function(patternName) {
+    var TdCnt, genStep, steps;
+    activePatternName = patternName || activePatternName;
+    tableEl.innerHTML = "";
+    TdCnt = 0;
+    genStep = function(step) {
+      var genTd, k, trEl, v;
+      trEl = document.createElement("tr");
+      TdCnt++;
+      genTd = function(k, data) {
+        var tdEl;
+        tdEl = document.createElement("td");
+        tdEl.classList.add(k);
+        tdEl.innerHTML = data || "=";
+        return trEl.appendChild(tdEl);
+      };
+      genTd("pos", TdCnt);
+      if (Object.keys(step).length === 0) {
+        for (k in demoStep) {
+          v = demoStep[k];
+          genTd(k, "=");
+        }
+      } else {
+        for (k in demoStep) {
+          v = demoStep[k];
+          genTd(k, step[k]);
+        }
+      }
+      maxYPos = TdCnt;
+      return tableEl.appendChild(trEl);
     };
+    steps = project.patterns[activePatternName].steps;
+    return steps.forEach(function(step) {
+      return genStep(step);
+    });
+  };
+  appendOption = function(key) {
+    var patternEl, patternOptionEl;
+    patternOptionEl = document.createElement("option");
+    patternEl = document.createElement("div");
+    patternEl.classList.add(key, "pattern");
+    patternOptionEl.innerHTML = key;
+    return patternSelectEl.appendChild(patternOptionEl);
+  };
+  genCollectionSelect = function(collection) {
+    var firstVal, key, val;
     appendOption("new");
-    _results = [];
     for (key in patterns) {
       val = patterns[key];
-      _results.push(appendOption(key));
+      appendOption(key);
     }
-    return _results;
+    firstVal = patternSelectEl[1].innerText;
+    patternSelectEl.value = firstVal;
+    return genPattern(firstVal);
   };
-  return genCollectionSelect();
+  genPatternModOptions = function() {
+    var genBtn, getSteps, setSteps;
+    genBtn = function(content, funct) {
+      var btn;
+      btn = document.createElement("input");
+      btn.type = 'button';
+      btn.value = content;
+      btn.addEventListener("click", funct);
+      ptnConfigEl.appendChild(btn);
+      return btn;
+    };
+    getSteps = function() {
+      return project.patterns[activePatternName].steps;
+    };
+    setSteps = function(steps) {
+      return project.patterns[activePatternName].steps = steps;
+    };
+    genBtn("+1", function(e) {
+      getSteps().push({});
+      return genPattern();
+    });
+    genBtn("-1", function(e) {
+      getSteps().pop();
+      return genPattern();
+    });
+    genBtn("*2", function(e) {
+      var steps, v, _i, _len;
+      steps = getSteps();
+      for (i = _i = 0, _len = steps.length; _i < _len; i = ++_i) {
+        v = steps[i];
+        steps.push(v);
+      }
+      return genPattern();
+    });
+    genBtn("/2", function(e) {
+      var len, steps;
+      steps = getSteps();
+      len = Math.round(steps.length / 2);
+      while (len--) {
+        steps.pop();
+      }
+      return genPattern();
+    });
+    genBtn("*2C", function(e) {
+      var newData, step, steps, _i, _len;
+      steps = getSteps();
+      newData = [];
+      for (i = _i = 0, _len = steps.length; _i < _len; i = ++_i) {
+        step = steps[i];
+        newData[i * 2] = step;
+        newData[(i * 2) + 1] = {};
+      }
+      setSteps(newData);
+      return genPattern();
+    });
+    genBtn("/2C", function(e) {
+      var newData, step, steps, _i, _len;
+      steps = getSteps();
+      newData = [];
+      for (i = _i = 0, _len = steps.length; _i < _len; i = ++_i) {
+        step = steps[i];
+        if (i % 2 === 0) {
+          newData.push(steps[i]);
+        }
+      }
+      setSteps(newData);
+      return genPattern();
+    });
+    return genBtn("RND", function(e) {
+      var currentIndex, randomIndex, steps, temporaryValue;
+      steps = getSteps();
+      currentIndex = steps.length;
+      while (0 !== currentIndex) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+        temporaryValue = steps[currentIndex];
+        steps[currentIndex] = steps[randomIndex];
+        steps[randomIndex] = temporaryValue;
+      }
+      return genPattern();
+    });
+  };
+  genPatternModOptions();
+  genCollectionSelect();
+  return initTableCtrl();
 };
 
 demoArr = [
@@ -378,7 +681,7 @@ genPopup = function(content, type, cbOnClose) {
     return colEl[active ^ 1].classList.remove("active");
   };
   window.ctrl.left = function(e) {
-    var el, i, lastGroup, targetName, trackArr, _i, _len, _ref, _results;
+    var el, lastGroup, targetName, trackArr, _i, _len, _ref, _results;
     if (contentPos.length === 0) {
       return;
     }
@@ -427,7 +730,7 @@ genPopup = function(content, type, cbOnClose) {
     }
   };
   getInArr = function(arr, targetGroup) {
-    var data, i, _i, _len;
+    var data, _i, _len;
     for (i = _i = 0, _len = arr.length; _i < _len; i = ++_i) {
       data = arr[i];
       if (Object.keys(arr[i])[0] === targetGroup) {

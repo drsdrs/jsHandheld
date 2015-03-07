@@ -1,6 +1,5 @@
 c = console; c.l = c.log
 
-
 require("coffee-script/register")
 
 path = require("path")
@@ -20,6 +19,7 @@ eventRouter = require("./server/eventRouter")(io.of('/eventRouter'))
 routes = require("./routes/index")
 terminal = require("./routes/terminal")
 fst = require("./routes/fst")(io.of('/formulaSampleTracker'))
+endymen = require("./routes/endymen")(io.of('/endymen'))
 
 # view engine setup
 app.set "env", "development"
@@ -35,6 +35,7 @@ app.use express.static(path.join(__dirname, "public"))
 app.use "/", routes
 app.use "/jsTerminal", terminal
 app.use "/formulaSampleTracker", fst
+app.use "/endymen", endymen
 
 # catch 404 and forward to error handler
 app.use (req, res, next) ->

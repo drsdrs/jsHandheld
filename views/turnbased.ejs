@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/endymen.css' />
+    <script type="text/javascript">window.c = console; c.l= c.log</script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="scripts/endymen.js"></script>
+  </head>
+  <body>
+
+    <div id="startScreen">
+
+      <button id="startGameBtn">START</button>
+
+      <div>
+        HIGHSCORE&nbsp
+        <span id="highScore">  
+          <%= highscore.name %>:<%= highscore.score %>
+        <span>
+      </div>
+
+    </div>
+
+    <div id="gameScreen" class="hidden">
+
+      <div id="statsView">
+        <div>Score:<span id="score"></span></div>
+        <div>Level:<span id="level"></span></div>
+        <div>Moves:<span id="moves"></span></div>
+      </div>
+
+      <div id="table"></div>
+
+    </div>
+
+  </body>
+</html>
