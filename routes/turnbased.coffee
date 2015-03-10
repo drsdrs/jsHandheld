@@ -10,8 +10,8 @@ module.exports = (io)->
 
 
   router.get "/", (req, res, next) ->
-    res.render "endymen",
-      title: "endymen-game"
+    res.render "turnbased",
+      title: "turnbased-game"
       highscore: getHighscore()
 
 

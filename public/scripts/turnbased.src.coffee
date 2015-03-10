@@ -1,5 +1,5 @@
 init = ->
-  console.log "INIT363"
+  console.log "INIT.1.2.3"
   gameScreen = document.getElementById("gameScreen")
   startScreen = document.getElementById("startScreen")
   startGameBtn = document.getElementById("startGameBtn")
@@ -17,7 +17,9 @@ init = ->
     "frustrated"
   ]
 
-  endymenGame =
+
+
+  turnbasedGame =
     els:
       table: document.getElementById("table")
       score: document.getElementById("score")
@@ -26,20 +28,20 @@ init = ->
 
     stats:
       size:
-        x:12
-        y:9
+        x: 9
+        y: 9
       level: 0
       score: 0
       moves: 0
       items: []
+      pPos: x:4,y:4
 
     start: ->
       startScreen.classList.add "hidden"
       gameScreen.classList.remove "hidden"
-      @stats.moves = 12
+      @stats.moves = 120
       @stats.score = 0
-      @stats.level = 0
-      @updateStats(0,0)
+      @stats.level = 7
       @initRandomFields()
       @buildTable()
 
@@ -51,11 +53,11 @@ init = ->
         row.forEach (item, x)->
           td = document.createElement("span")
           iconTd = document.createElement("span")
-          td.addEventListener "click", -> that.startSearch x,y
-          td.click = -> that.startSearch x,y
           td.appendChild iconTd
           tr.appendChild td
-          that.setTd td, item
+          if that.stats.pPos.x==x&&that.stats.pPos.y==y
+            item = 7
+          that.setTd td, item #if item != 0
 
         that.els.table.appendChild tr
 
@@ -64,8 +66,16 @@ init = ->
       icon = blocks[type]
       iconTd = td.childNodes[0]
       td.className = "color-"+icon
-      iconTd.className = " icon-"+icon
+      iconTd.className = "icon-"+icon
       td
+
+
+    movePlayer: (xMod,yMod)->
+      pos = @stats.pPos
+      posNew = x: pos.x+xMod, y: pos.y+yMod
+
+    swapTwoFields: (posA, posB)->
+
 
 
     initRandomFields: ->
@@ -75,35 +85,9 @@ init = ->
         x = @stats.size.x
         arr[y] = []
         while x--
-          val = Math.round Math.random()*2
+          rnd = Math.random()*2
+          val = if rnd < .25 then 0 else if rnd > 1.75 then 1 else 2
           arr[y][x] = val
-
-    it: 0
-    found: 0
-    
-    startSearch:(x,y)->
-      if @stats.moves>0
-        @stats.moves--
-        @findNext x,y
-
-    findNext: (x, y)->
-      @it++
-      a = @stats.items
-      col = a[y][x]
-      @found++
-      a[y][x]= "x"
-
-      if a[y-1]?[x]==col then @findNext x,y-1
-      if a[y+1]?[x]==col then @findNext x,y+1
-      if a[y][x-1]? && a[y][x-1]==col then @findNext x-1,y
-      if a[y][x+1]? && a[y][x+1]==col then @findNext x+1,y
-      
-      if @it==1
-        @updateStats(@found+1, col)
-        @dropDown()
-        @found = 0
-      @stats.items = a
-      @it--
 
     getRndColor:->
       range = @stats.level+2
@@ -112,52 +96,25 @@ init = ->
       Math.floor Math.random()*range
 
     updateStats: (n, col)->
-      bonus = if col<3 then 2 else 4*col
+      bonus = if col<3 then 20 else 60*col
       score = (n*n*bonus)
-      bonMoves = if col>2 then col-2 else 0
-      moves =
-        if score>100 then 1
-        else if score>250 then 2
-        else if score>1000 then 5
-        else if score>5000 then 10
-        else if score>10000 then 15
-        else 0
+   
       @stats.moves+= moves+bonMoves
-      @stats.level += 1 if (@stats.score/(3333*(@stats.level+1)))>@stats.level
+      @stats.level += 1 if (@stats.score/(2000*(@stats.level+1)))>@stats.level
       @stats.score += score
       @els.moves.innerHTML = @stats.moves
       @els.level.innerHTML = @stats.level
       @els.score.innerHTML = @stats.score
 
-    dropDown: ->
-      a = @stats.items
-      h = a.length
-      w = a[h-1].length
 
-      for v, x in a[h-1]
-        hh = h
-        dropDowns = 0
-        while hh--
-          if a[hh][x]=="x" then dropDowns++
-          else if dropDowns>0
-            trgPos = hh+dropDowns
-            td = @els.table.childNodes[trgPos].childNodes[x]
-            val = a[hh][x]
-            a[trgPos][x] = val
-            @setTd td, val, true
-            #@els.table.childNodes[trgPos].childNodes[x] = td
-        hh = 0
-
-        while dropDowns--
-          td = @els.table.childNodes[dropDowns].childNodes[x]
-          val = @getRndColor()
-          a[dropDowns][x] = val
-          @setTd td, val, true
 
 
   ## Start game
-  startGameBtn.addEventListener "click", ->endymenGame.start()
-  endymenGame.start()
+  startGameBtn.addEventListener "click", ->turnbasedGame.start()
+  turnbasedGame.start()
+
+  window.left = -> turnbasedGame.movePlayer -1, 0
+  window.right = -> turnbasedGame.movePlayer 1, 0
 
 window.onload = ->
   #gamepad events

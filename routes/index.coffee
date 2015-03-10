@@ -5,6 +5,7 @@ categories= {
     {name: "formulaSampleTracker", img: "fst"}
     {name: "mameVertical", img: "mame"}
     {name: "endymen", img: "*"}
+    {name: "turnbased", img: "*"}
     {name: "SysTools", img: "*"}
   ]
   systools: [

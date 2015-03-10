@@ -33,6 +33,16 @@ init = ->
       moves: 0
       items: []
 
+    start: ->
+      startScreen.classList.add "hidden"
+      gameScreen.classList.remove "hidden"
+      @stats.moves = 12
+      @stats.score = 0
+      @stats.level = 0
+      @updateStats(0,0)
+      @initRandomFields()
+      @buildTable()
+
     buildTable: ->
       that = @
       arr = @stats.items
@@ -68,15 +78,6 @@ init = ->
           val = Math.round Math.random()*2
           arr[y][x] = val
 
-    start: ->
-      startScreen.classList.add "hidden"
-      gameScreen.classList.remove "hidden"
-      @stats.moves = 120
-      @stats.score = 0
-      @stats.level = 7
-      @initRandomFields()
-      @buildTable()
-
     it: 0
     found: 0
     
@@ -111,17 +112,18 @@ init = ->
       Math.floor Math.random()*range
 
     updateStats: (n, col)->
-      bonus = if col<3 then 20 else 60*col
+      bonus = if col<3 then 2 else 4*col
       score = (n*n*bonus)
       bonMoves = if col>2 then col-2 else 0
       moves =
-        if score>1000 then 1
-        else if score>10000 then 5
-        else if score>50000 then 10
-        else if score>100000 then 15
+        if score>100 then 1
+        else if score>250 then 2
+        else if score>1000 then 5
+        else if score>5000 then 10
+        else if score>10000 then 15
         else 0
       @stats.moves+= moves+bonMoves
-      @stats.level += 1 if (@stats.score/(2000*(@stats.level+1)))>@stats.level
+      @stats.level += 1 if (@stats.score/(3333*(@stats.level+1)))>@stats.level
       @stats.score += score
       @els.moves.innerHTML = @stats.moves
       @els.level.innerHTML = @stats.level
@@ -142,7 +144,6 @@ init = ->
             td = @els.table.childNodes[trgPos].childNodes[x]
             val = a[hh][x]
             a[trgPos][x] = val
-            c.l "drop: ",x,hh
             @setTd td, val, true
             #@els.table.childNodes[trgPos].childNodes[x] = td
         hh = 0
@@ -157,4 +158,3 @@ init = ->
   ## Start game
   startGameBtn.addEventListener "click", ->endymenGame.start()
   endymenGame.start()
-  window.gg = endymenGame
